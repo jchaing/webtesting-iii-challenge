@@ -3,26 +3,35 @@
 import React from 'react';
 import * as rtl from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import Dashboard from './Dashboard'
+import Dashboard from './Dashboard';
+import Controls from '../controls/Controls';
+import Display from '../display/Display';
 
-// defaults to unlocked and open using snapshot
 test('<Dashboard /> snapshot', () => {
   const wrapper = rtl.render(<Dashboard />);
   expect(wrapper.asFragment()).toMatchSnapshot();
-})
+});
 
-// // shows the controls and display
-// test('shows the controls and display', () => {
-//   const controls = rtl.render(<Controls />);
-//   const display = rtl.render(<Display />);
+test('Defaults to Unlocked and Open', () => {
+  const { getByText } = rtl.render(<Dashboard />);
 
+  expect(getByText(/unlocked/i).textContent).toMatch(/unlocked/i);
+  expect(getByText(/open/i).textContent).toMatch(/open/i);
+});
 
+test('Shows the controls and display', () => {
+  const { getByText } = rtl.render(<Dashboard />);
 
-// })
+  expect(getByText(/unlocked/i).textContent).toMatch(/unlocked/i);
+  expect(getByText(/open/i).textContent).toMatch(/open/i);
+  expect(getByText(/lock gate/i).textContent).toMatch(/lock gate/i);
+  expect(getByText(/close gate/i).textContent).toMatch(/close gate/i);
+});
 
-// test('cannot be opened if it is locked', () => {
-//   const entry = rtl.render(<Dashboard locked={true} hasKeyCard={false} />);
-//   const openButton = entry.getByTestId(/open-button/i);
+test('Cannot be Closed or Opened if it is Locked', () => {
+  const wrapper = rtl.render(<Dashboard />);
+  const locked = wrapper.queryByText(/unlock gate/i)
 
-//   expect(openButton).not.toBeEnabled();
-// });
+  locked && expect(wrapper.getByText(/locked/i).className).toMatch(/red-led/i);
+  locked && expect(wrapper.getByText(/closed/i).className).toMatch(/red-led/i);
+});
